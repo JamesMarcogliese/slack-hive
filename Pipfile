@@ -9,6 +9,9 @@ name = "pypi"
 
 requests = "*"
 elasticsearch = "*"
+slackclient = "*"
+slackeventsapi = "*"
+flask = "*"
 
 
 [dev-packages]

@@ -1,3 +1,5 @@
+FOR LOCAL DEVELOPMENT:
+
 Install Docker for Windows:
 https://www.docker.com/docker-windows
 
@@ -5,6 +7,10 @@ Install Python3 for Windows:
 https://www.python.org/downloads/
 
 Run: setup_python_tools.p1
+
+Insert slack secrets into export_slack_secrets.ps1
+
+Run: run_all.ps1
 
 --------------------------------------
 
@@ -20,8 +26,8 @@ Logstash - Port: 5044
 Logstash is currently disabled, but can be enabled by
 changing the cmd argument in start_elk.bat. 
 
---------------------------------------
+Run: export_slack_secrets.ps1 to export API secret auth to local env
 
-When running the script, use:
-$ pipenv run python main.py
+Run: launch_ngrok.ps1 to launch ngrok to expose flash server port to the web
 
+Run: launch_app.ps1
