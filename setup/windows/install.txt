@@ -1,0 +1,27 @@
+Install Docker for Windows:
+https://www.docker.com/docker-windows
+
+Install Python3 for Windows:
+https://www.python.org/downloads/
+
+Run: setup_python_tools.p1
+
+--------------------------------------
+
+Run: start_elk.p1 to update and run the ELK Docker container.
+Run: stop_elk.p1 to stop the ELK Docker container.
+Run: remove_elk.p1 to remove the ELK Docker container from Docker.
+
+When start_elk is run, 
+Kibana - Port: 5601
+Elasticsearch - Port: 9200
+Logstash - Port: 5044 
+
+Logstash is currently disabled, but can be enabled by
+changing the cmd argument in start_elk.bat. 
+
+--------------------------------------
+
+When running the script, use:
+$ pipenv run python main.py
+
