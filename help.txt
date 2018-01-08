@@ -1,0 +1,5 @@
+Hive is a bot to help you save, share, and retrieve notes.
+
+* Type out a note and send to save!
+* set team [team] - set your team (rollout, systems, support, enhancements, marketing, hr)
+* search [keyword] - search for notes that match the keywords you provide
