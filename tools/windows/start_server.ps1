@@ -1,9 +1,10 @@
 "------------------------------------------------------"
-"Lauching the flask server ..."
+"Launching the flask server ..."
 "------------------------------------------------------"
-& .\export_slack_secrets.ps1
+& .\export_secrets.ps1
 cd..
 cd..
+cd bin
 pipenv run python app.py
 
 "Press any key to continue..."
