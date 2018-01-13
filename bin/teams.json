@@ -1,0 +1,73 @@
+[
+	{
+		"fallback": "If you could read this message, you'd be choosing your team right now.",
+		"color": "#3AA3E3",
+		"attachment_type": "default",
+		"callback_id": "team_selection",
+		"actions": [
+			{
+				"name": "teamns_list",
+				"text": "Pick a team...",
+				"type": "select",
+				"options": [
+					{
+						"text": "Data",
+						"value": "data"
+					},
+					{
+						"text": "Delivery",
+						"value": "delivery"
+					},
+					{
+						"text": "ER",
+						"value": "er"
+					},
+					{
+						"text": "Finance",
+						"value": "finance"
+					},
+					{
+						"text": "HR",
+						"value": "hr"
+					},
+					{
+						"text": "IT",
+						"value": "it"
+					},
+					{
+						"text": "Job Board Enterprise",
+						"value": "jobBoardEnterprise"
+					},
+					{
+						"text": "Job Board Pro & Courses",
+						"value": "jobBoardPro&Courses"
+					},
+					{
+						"text": "Marketing",
+						"value": "marketing"
+					},
+					{
+						"text": "New Products",
+						"value": "Sales"
+					},
+					{
+						"text": "Security",
+						"value": "security"
+					},
+					{
+						"text": "Service",
+						"value": "service"
+					},
+					{
+						"text": "Systems",
+						"value": "systems"
+					},
+					{
+						"text": "Testing",
+						"value": "testing"
+					}
+				]
+			}
+		]
+	}
+]

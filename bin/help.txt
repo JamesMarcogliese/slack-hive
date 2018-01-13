@@ -1,5 +1,6 @@
 Hive is a bot to help you save, share, and retrieve notes.
 
-* team [team] - set your team (rollout, systems, support, enhancements)
+* team - set your team 
 * save [note] - save your note
-* search [keyword] - search for notes that match the keywords you provide
+* find [keyword] - search for notes that match the keywords you provide
+* review - review your past notes

@@ -6,15 +6,19 @@ from slackeventsapi import SlackEventAdapter
 from slackclient import SlackClient
 import os
 
+# Import commands module
 import commands
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
-SLACK_VERIFICATION_TOKEN = os.environ["VERIFICATION_TOKEN"]
+SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 slack_events_adapter = SlackEventAdapter(SLACK_VERIFICATION_TOKEN, "/slack/events")
 
 # Create a SlackClient for your bot to use for Web API requests
-SLACK_BOT_TOKEN = os.environ["BOT_TOKEN"]
-CLIENT = SlackClient(SLACK_BOT_TOKEN)
+SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
+slack_client = SlackClient(SLACK_BOT_TOKEN)
+
+# Flask webserver for incoming traffic from Slack
+#app = Flask(__name__)
 
 # Responder to direct messages
 @slack_events_adapter.on("message")
@@ -23,24 +27,16 @@ def handle_message(event_data):
 	
 	if message.get("subtype") is None: 
 		channel = message["channel"]
-		message = commands.identifyCommand(event_data)
-		CLIENT.api_call("chat.postMessage", channel=channel, text=message)
-	
-	
+		message,attachment = commands.identify_command(event_data)
+		slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=attachment)
+		
+@app.route("/slack/message_actions", methods=["POST"])
+def message_actions():
+	# Parse the request payload
+	message_action = json.loads(request.form["payload"])
+	message,attachment = commands.set_team(message)
+	slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=attachment)
 	
 
-	
-
-
-# Example reaction emoji echo
-#@slack_events_adapter.on("reaction_added")
-#def reaction_added(event_data):
-#    event = event_data["event"]
-#    emoji = event["reaction"]
-#    channel = event["item"]["channel"]
-#    text = ":%s:" % emoji
-#    CLIENT.api_call("chat.postMessage", channel=channel, text=text)
-
-# Once we have our event listeners configured, we can start the
-# Flask server with the default `/events` endpoint on port 3000
+# Flask server with the default endpoint on port 3000
 slack_events_adapter.start(port=3000)
