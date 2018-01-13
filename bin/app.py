@@ -2,7 +2,7 @@
 """
 A routing layer for the Hive Slack app 
 """
-from slackeventsapi import SlackEventAdapter
+from slackserver import SlackEventAdapter
 from slackclient import SlackClient
 import os
 
@@ -11,7 +11,7 @@ import commands
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
-slack_events_adapter = SlackEventAdapter(SLACK_VERIFICATION_TOKEN, "/slack/events")
+slack_events_adapter = SlackEventAdapter(SLACK_VERIFICATION_TOKEN, "/slack")
 
 # Create a SlackClient for your bot to use for Web API requests
 SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
@@ -26,15 +26,15 @@ def handle_message(event_data):
 	message = event_data["event"]
 	
 	if message.get("subtype") is None: 
+		print (event_data)
 		channel = message["channel"]
 		message,attachment = commands.identify_command(event_data)
 		slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=attachment)
 		
-@app.route("/slack/message_actions", methods=["POST"])
-def message_actions():
-	# Parse the request payload
-	message_action = json.loads(request.form["payload"])
-	message,attachment = commands.set_team(message)
+@slack_events_adapter.on("message_action")
+def message_action(action_data):
+	channel = action_data["channel"]["id"]
+	message,attachment = commands.identify_callback(action_data)
 	slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=attachment)
 	
 

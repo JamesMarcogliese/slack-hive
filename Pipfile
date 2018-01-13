@@ -10,8 +10,8 @@ name = "pypi"
 requests = "*"
 elasticsearch = "*"
 slackclient = "*"
-slackeventsapi = "*"
 flask = "*"
+pyee = "*"
 
 
 [dev-packages]

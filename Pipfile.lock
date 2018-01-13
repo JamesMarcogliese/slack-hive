@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "eed1dfc313d86c012b9c173ca81abf6499869fb188d998d52c4cf1376f697192"
+            "sha256": "fc9195dc92355a5238c655779e87a26a111888692422c22eabf9c85ee1c136c5"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -114,12 +114,6 @@
                 "sha256:5d789e5f5f8c4d57052e946701fcf9d6d45e0db6dfd2b163707517cccede52fb"
             ],
             "version": "==1.1.0"
-        },
-        "slackeventsapi": {
-            "hashes": [
-                "sha256:62e35a3f603d95648fa348bb0be587f995f0fa5dadfdaf8ed2c4ca7101843d70"
-            ],
-            "version": "==1.0.1"
         },
         "urllib3": {
             "hashes": [
