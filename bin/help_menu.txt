@@ -1,6 +1,0 @@
-Hive is a bot to help you save, share, and retrieve notes.
-
-* team - set your team 
-* save [note] - save your note
-* find [keyword] - search for notes that match the keywords you provide
-* review - review your past notes
