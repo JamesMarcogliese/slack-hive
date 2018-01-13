@@ -13,14 +13,14 @@ import re
 # Connect to Elasticsearch instance
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
-def save_note(message):
+def save_note(event_data):
 	print ("SaveNote")
 	
 	#Search for author's team from author index
 	query = {
 			"query": {
 				"match": {
-					"author": message['user'] 
+					"author": event_data['event']['user'] 
 				}
 			}
 		}
@@ -33,8 +33,8 @@ def save_note(message):
 	
 	# Save note to note-index
 	doc = {
-		'note': message['text'].lstrip('save '),
-		'author': message['user'],
+		'note': event_data['event']['text'].lstrip('save '),
+		'author': event_data['event'],
 		'frequency': 0,
 		'team': author['hits']['hits'][0]['_source']['team'],
 		'timestamp': datetime.now()
@@ -44,21 +44,23 @@ def save_note(message):
 
 	return "Note saved! :notebook:", None
 
-def find_note(message):
+def find_note(event_data):
 	print ("findNote")
-	message = message.lstrip('find ')
+	message = event_data['event']['text'].lstrip('find ')
 
-def set_team(message):
+def set_team(event_data):
 	print ("setTeam")
 	
-	if message["type"] is not None and message["type"] is not "interactive_message":
+	if event_data["type"] == 'event_callback':
 		# Send the list to the user
 		menu = json.load(open('teams_menu.json'))
-		return "What team do you belong to?",menu
-	else:
+		return "What team do you belong to?", menu
+	elif event_data["type"] == 'interactive_message':
 		# Check the users selection
-		user = message_action["user"]["id"]
-		selected_team = message["actions"][0]["selected_options"][0]["value"]
+		user = event_data["user"]["id"]
+		selected_team = event_data["actions"][0]["selected_options"][0]["value"]
+	else:
+		return "There's been a error.", None
 		
 	#Search for author's team from author index
 	query = {
@@ -71,7 +73,7 @@ def set_team(message):
 	if (es.indices.exists(index="author-index")):
 		author = es.search(index="author-index", body=query)	
 		if (author['hits']['total'] != 0):
-			es.delete(index="author-index", id=author['hits']['hits'][0]['_id'])
+			es.delete(index="author-index", doc_type='author', id=author['hits']['hits'][0]['_id'])
 	
 	doc = {
 		'author': user,
@@ -80,26 +82,32 @@ def set_team(message):
 	
 	es.index(index="author-index", doc_type='author', body=doc, refresh="true") 
 	
-	return "Team set!"
+	return "You have set yourself on the " + selected_team + " team!", None
 
-def review(message):
+def review(event_data):
 	print ("review")
 	
-def help(message):
+def help(event_data):
 	print ("help")
 	return Path('help_menu.txt').read_text(), None 
 	
-def fallback(message):
+def fallback(event_data):
 	print ("fallback")
 	return ":confounded: Sorry, I don't understand. Type 'help' to see a list of what I can do!", None
 
 def identify_command(event_data):
-	message = event_data["event"]
-	channel = message["channel"]
-	message_text = message['text']
+	channel = event_data["event"]["channel"]
+	message_text = event_data["event"]['text']
 	patterns=['^save (.*)', '^find (.*)', '^team', '^help', '.*']
 	functions=['save_note', 'find_note', 'set_team', 'help', 'fallback']
 	
 	for idx, pattern in enumerate(patterns):
 		if re.compile(patterns[idx]).search(message_text) is not None:
-			return eval(functions[idx])(message)
+			return eval(functions[idx])(event_data)
+			
+def identify_callback(action_data):
+	callback_types=['team_selection']
+	functions=['set_team']
+	for idx, callback_type in enumerate(callback_types):
+		if action_data["callback_id"] == callback_types[idx]:
+			return eval(functions[idx])(action_data)
