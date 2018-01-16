@@ -1,6 +1,6 @@
 [
 	{
-		"fallback": "If you could read this message, you'd be choosing your team right now.",
+		"fallback": "Upgrade your Slack client to see these options!",
 		"color": "#3AA3E3",
 		"attachment_type": "default",
 		"callback_id": "team_selection",

@@ -1,4 +1,4 @@
-Hive is a bot to help you save, share, and retrieve notes.
+I'm a bot to help you save and share little tidbits of information! :honeybee:
 
 * team - set your team 
 * save [note] - save your note
