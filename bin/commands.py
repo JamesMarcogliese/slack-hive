@@ -18,7 +18,7 @@ def save_note(event_data):
 	#Search for author's team from author index
 	query = {
 			"query": {
-				"match": {
+				"term": {
 					"author": event_data['event']['user'] 
 				}
 			}
@@ -51,8 +51,70 @@ def find_note(event_data):
 	print ("findNote")
 	message = event_data['event']['text'].lstrip('find ')
 	
+#	query = {
+#		"query": {
+#			"query_string" : { 
+#				"query" : message 
+#			},
+#			"term": {
+#				"team": 
+#			}
+#		}
+#	}
+
+	#Search for author's team from author index
+	query = {
+			"query": {
+				"term": {
+					"author": event_data['event']['user'] 
+				}
+			}
+		}
+	if (es.indices.exists(index="author-index")):
+		author = es.search(index="author-index", body=query)
 	
+	if (author['hits']['total'] == 0) or not(es.indices.exists(index="author-index")):
+		message = ("Wait! :raised_hand:I need to know what team you're on before I can save your notes!\n" 
+				   "Please set your team by using the 'team' command!"
+				   )
+		slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=None)
+		return 
 	
+	query = {
+		"query": {
+			"filtered": {
+				"query": {
+					"query_string" : { 
+						"query" : message 
+					}
+				},
+				"filter": {
+					"or": [
+						{
+							"term" : {
+								"author" : event_data["event"]["user"]
+							},
+						},
+						{
+							"term": {
+								"team": author["hits"]["hits"][0]["_source"]["team"]
+							}
+						}
+					]
+				}
+			}
+		}
+	}
+	
+	notes = es.search(index="author-index", body=query)
+	
+#	query = {
+#		"query": {
+#			"query_string": {
+#				"query": message
+#			}
+#		}
+#	}
 
 def set_team(event_data):
 	print ("setTeam")
@@ -72,7 +134,7 @@ def set_team(event_data):
 	#Search for author's team from author index
 	query = {
 			"query": {
-				"match": {
+				"term": {
 					"author": user 
 				}
 			}
@@ -111,7 +173,7 @@ def review_notes(event_data):
 				{ "timestamp": {"order": "desc"}} 
 			],
 			"query": {
-				"match": {
+				"term": {
 					"author": event_data['event']['user'] 
 				}
 			}
