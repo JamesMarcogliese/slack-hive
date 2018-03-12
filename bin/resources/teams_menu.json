@@ -6,28 +6,32 @@
 		"callback_id": "team_selection",
 		"actions": [
 			{
-				"name": "teamns_list",
-				"text": "Pick a team...",
+				"name": "teams_list",
+				"text": "Select your team...",
 				"type": "select",
 				"options": [
+					{
+						"text": "Account Directors",
+						"value": "account"
+					},
 					{
 						"text": "Data",
 						"value": "data"
 					},
 					{
-						"text": "Delivery",
-						"value": "delivery"
+						"text": "Design",
+						"value": "design"
 					},
 					{
-						"text": "ER",
-						"value": "er"
+						"text": "Enhancements",
+						"value": "enhancements"
 					},
 					{
 						"text": "Finance",
 						"value": "finance"
 					},
 					{
-						"text": "HR",
+						"text": "Human Resources",
 						"value": "hr"
 					},
 					{
@@ -51,20 +55,24 @@
 						"value": "Sales"
 					},
 					{
+						"text": "Rollout",
+						"value": "rollout"
+					},
+					{
 						"text": "Security",
 						"value": "security"
 					},
 					{
-						"text": "Service",
-						"value": "service"
+						"text": "Support",
+						"value": "support"
 					},
 					{
 						"text": "Systems",
 						"value": "systems"
 					},
 					{
-						"text": "Testing",
-						"value": "testing"
+						"text": "Test",
+						"value": "test"
 					}
 				]
 			}
