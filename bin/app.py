@@ -4,6 +4,7 @@ A routing layer for the Hive Slack app
 """
 
 from slackserver import SlackEventAdapter
+from utilities import message_filter
 from utilities import globals
 import os
 
@@ -20,7 +21,7 @@ globals.init()
 # Responder to direct messages
 @slack_events_adapter.on("message")
 def handle_message(event_data):
-	if event_data.get("event").get("subtype") is None: 
+	if ((event_data.get("event").get("subtype") is None) and (message_filter.is_direct_message(event_data))):
 		command_dispatcher.dispatch_event(event_data)
 		
 @slack_events_adapter.on("message_action")

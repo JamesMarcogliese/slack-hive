@@ -13,23 +13,13 @@ def pattern():
 def execute_event(event_data):
 	print ("findNote")
 	message = event_data['event']['text'].lstrip('find ')
-	
-#	query = {
-#		"query": {
-#			"query_string" : { 
-#				"query" : message 
-#			},
-#			"term": {
-#				"team": 
-#			}
-#		}
-#	}
+	user = event_data['event']['user'] 
 
 	#Search for author's team from author index
 	query = {
 			"query": {
 				"term": {
-					"author": event_data['event']['user'] 
+					"author": user
 				}
 			}
 		}
@@ -43,49 +33,90 @@ def execute_event(event_data):
 		globals.slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=None)
 		return 
 		
-	userQuery = {
-	
-	}
-	
-	userQuery = {
-	
-	}
-	
-	https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-common-terms-query.html
-	
-	https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
-	query = {
+	user_query_own = {
 		"query": {
-			"filtered": {
-				"query": {
-					"query_string" : { 
-						"query" : message 
-					}
+			"common": {
+				"body": {
+					"query": message,
+					"cutoff_frequency": 0.001
 				},
 				"filter": {
-					"or": [
-						{
-							"term" : {
-								"author" : event_data["event"]["user"]
-							},
-						},
-						{
-							"term": {
-								"team": author["hits"]["hits"][0]["_source"]["team"]
-							}
-						}
-					]
+					"term": { "author": user }
 				}
 			}
 		}
 	}
 	
-	notes = globals.es.search(index="author-index", body=query)
+	user_query_team = {
+		"query": {
+			"common": {
+				"body": {
+					"query": message,
+					"cutoff_frequency": 0.001
+				},
+				"filter": {
+					"term": { "team": author["hits"]["hits"][0]["_source"]["team"] }
+				}
+			}
+		}
+	}
 	
-#	query = {
-#		"query": {
-#			"query_string": {
-#				"query": message
-#			}
-#		}
-#	}
+	if (globals.es.indices.exists(index="note-index")):
+		user_notes = globals.es.search(index="note-index", body=user_query_own)
+		team_notes = globals.es.search(index="note-index", body=user_query_team)
+	else:
+		print ("Note-Index not found!")
+		
+	attachments = [] # --------------------------------------------------------------------------
+	
+	if (int(user_notes["hits"]["total"]) >= 4):
+		user_idx = 4
+	elif (int(user_notes["hits"]["total"]) == 0):
+		user_idx = 0
+	else:
+		user_idx = int(user_notes["hits"]["total"])
+		
+	if (int(team_notes["hits"]["total"]) >= 4):
+		team_idx = 4
+	elif (int(team_notes["hits"]["total"]) == 0):
+		team_idx = 0
+	else:
+		team_idx = int(team_notes["hits"]["total"])
+		
+	for idx in range(user_idx):
+		record = {}
+
+		print ("User record " + str(idx))
+		record["color"] = "#000000"
+		record["fields"] = [
+				{
+					"value": user_notes["hits"]["hits"][idx]["_source"]["note"]
+				}
+		]
+		record["footer"] = user_notes["hits"]["hits"][idx]["_source"]["author"]
+		record["ts"] = user_notes["hits"]["hits"][idx]["_source"]["timestamp"]
+		#record["callback_id"] = "note_selection" + user_notes["hits"]["hits"][idx]["_id"]
+		attachments.append(record)
+		
+	for idx in range(team_idx):
+		record = {}
+
+		print ("Team record " + str(idx))
+		record["color"] = "#0079c0"
+		record["fields"] = [
+				{
+					"value": team_notes["hits"]["hits"][idx]["_source"]["note"]
+				}
+		]
+		record["footer"] = team_notes["hits"]["hits"][idx]["_source"]["author"]
+		record["ts"] = team_notes["hits"]["hits"][idx]["_source"]["timestamp"]
+		#record["callback_id"] = "note_selection" + team_notes["hits"]["hits"][idx]["_id"]
+		attachments.append(record)
+	
+	globals.slack_client.api_call("chat.postMessage", channel=channel, text="Here what I found:", attachments=attachments)
+	
+	print ("review")
+	
+
+	
+	

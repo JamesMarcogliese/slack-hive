@@ -21,7 +21,7 @@ for importer, module_name, is_pkg in pkgutil.iter_modules(commands.__path__):
 
 def dispatch_event(event_data):
 	print ("Dispatch_event")
-		
+
 	message_text = event_data["event"]['text']
 	for command in command_list:
 		pattern = getattr(eval(command), 'pattern')()

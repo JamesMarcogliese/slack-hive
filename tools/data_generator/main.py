@@ -9,10 +9,9 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 import json
 import requests
+import csv
+records = []
 
-#if (es.indices.exists(index="test-index")):
-#	es.indices.delete(index="test-index")
-	
 if (es.indices.exists(index="note-index")):
 	es.indices.delete(index="note-index")
 	
@@ -21,20 +20,53 @@ if (es.indices.exists(index="author-index")):
 
 doc = {
 	'author': 'U8GQW24TY',
-	'team': 'delivery'
+	'team': 'rollout'
+	}
+	
+doc = {
+	'author': 'U8GQW24TY',
+	'team': 'rollout'
 	}
 
 res = es.index(index="author-index", doc_type='author', body=doc) 
 es.indices.refresh(index="author-index")	
 	
-#query = {
-#		"query": {
-#			"match": {
-#				"author": "U1235" 
-#			}
-#		}
-#	}
+dt = datetime.now()
+unix_time = time.mktime(dt.timetuple())
+
+with open('testData1.csv') as csvDataFile:
+    csvReader = csv.reader(csvDataFile)
+    for row in csvReader:
+        records.append(row[0])
+
+for note in (records):		
+# Save note to note-index
+	doc = {
+		'note': note,
+		'author': "U8GQW24TY",
+		'frequency': 0,
+		'team': "rollout",
+		'timestamp': unix_time
+		}
+	res = es.index(index="note-index", body=doc) 
+	
+records = []	
+with open('testData2.csv') as csvDataFile:
+    csvReader = csv.reader(csvDataFile)
+    for row in csvReader:
+        records.append(row[0])
 		
+for note in (records):		
+# Save note to note-index
+	doc = {
+		'note': note,
+		'author': "U8GQW24TY",
+		'frequency': 0,
+		'team': "rollout",
+		'timestamp': unix_time
+		}
+	res = es.index(index="note-index", body=doc) 
+
 #res = es.search(index="author-index", body=query)
 
 #if (res['hits']['hits'][0]['_source']['team']) is None:
