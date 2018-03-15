@@ -54,3 +54,4 @@ es.indices.refresh(index="author-index")
 #print("Got %d Hits:" % res['hits']['total'])
 #for hit in res['hits']['hits']:
 #    print("%(timestamp)s %(author)s: %(note)s" % hit["_source"])
+

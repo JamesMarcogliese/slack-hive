@@ -37,12 +37,23 @@ def execute_event(event_data):
 		author = es.search(index="author-index", body=query)
 	
 	if (author['hits']['total'] == 0) or not(globals.es.indices.exists(index="author-index")):
-		message = ("Wait! :raised_hand:I need to know what team you're on before I can save your notes!\n" 
+		message = ("Wait! :raised_hand:I need to know what team you're on before I can search for notes!\n" 
 				   "Please set your team by using the 'team' command!"
 				   )
 		globals.slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=None)
 		return 
+		
+	userQuery = {
 	
+	}
+	
+	userQuery = {
+	
+	}
+	
+	https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-common-terms-query.html
+	
+	https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html
 	query = {
 		"query": {
 			"filtered": {
