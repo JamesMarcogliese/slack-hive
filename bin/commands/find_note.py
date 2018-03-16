@@ -14,17 +14,18 @@ def execute_event(event_data):
 	print ("findNote")
 	message = event_data['event']['text'].lstrip('find ')
 	user = event_data['event']['user'] 
+	channel = event_data["event"]["channel"]	
 
 	#Search for author's team from author index
 	query = {
 			"query": {
-				"term": {
+				"match": {
 					"author": user
 				}
 			}
 		}
 	if (globals.es.indices.exists(index="author-index")):
-		author = es.search(index="author-index", body=query)
+		author = globals.es.search(index="author-index", body=query)
 	
 	if (author['hits']['total'] == 0) or not(globals.es.indices.exists(index="author-index")):
 		message = ("Wait! :raised_hand:I need to know what team you're on before I can search for notes!\n" 
@@ -35,28 +36,31 @@ def execute_event(event_data):
 		
 	user_query_own = {
 		"query": {
-			"common": {
-				"body": {
-					"query": message,
-					"cutoff_frequency": 0.001
+			"bool": {
+				"should": [
+					{"match": { "note": message }}
+				],
+				"must": {
+					"match": { "author": user }
 				},
-				"filter": {
-					"term": { "author": user }
-				}
+				"minimum_should_match": "100%"
 			}
 		}
 	}
 	
 	user_query_team = {
 		"query": {
-			"common": {
-				"body": {
-					"query": message,
-					"cutoff_frequency": 0.001
+			"bool": {
+				"should": [
+					{"match": { "note": message }}
+				],
+				"must": {
+					"match": { "team": author["hits"]["hits"][0]["_source"]["team"] }
 				},
-				"filter": {
-					"term": { "team": author["hits"]["hits"][0]["_source"]["team"] }
-				}
+				"must_not": {
+					"match": { "author": user }
+				},
+				"minimum_should_match": "100%"
 			}
 		}
 	}
@@ -67,6 +71,11 @@ def execute_event(event_data):
 	else:
 		print ("Note-Index not found!")
 		
+		
+	#-------------------------------------------------------------	
+	
+	
+	
 	attachments = [] # --------------------------------------------------------------------------
 	
 	if (int(user_notes["hits"]["total"]) >= 4):

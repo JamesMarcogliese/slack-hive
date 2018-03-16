@@ -10,6 +10,7 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 import json
 import requests
 import csv
+import time
 records = []
 
 if (es.indices.exists(index="note-index")):
@@ -18,17 +19,18 @@ if (es.indices.exists(index="note-index")):
 if (es.indices.exists(index="author-index")):
 	es.indices.delete(index="author-index")
 
-doc = {
+doc1 = {
 	'author': 'U8GQW24TY',
 	'team': 'rollout'
 	}
 	
-doc = {
-	'author': 'U8GQW24TY',
+doc2 = {
+	'author': 'U8GQW26TY',
 	'team': 'rollout'
 	}
 
-res = es.index(index="author-index", doc_type='author', body=doc) 
+res = es.index(index="author-index", doc_type='author', body=doc1) 
+res = es.index(index="author-index", doc_type='author', body=doc2) 
 es.indices.refresh(index="author-index")	
 	
 dt = datetime.now()
@@ -48,7 +50,7 @@ for note in (records):
 		'team': "rollout",
 		'timestamp': unix_time
 		}
-	res = es.index(index="note-index", body=doc) 
+	res = es.index(index="note-index", doc_type='note', body=doc) 
 	
 records = []	
 with open('testData2.csv') as csvDataFile:
@@ -60,12 +62,12 @@ for note in (records):
 # Save note to note-index
 	doc = {
 		'note': note,
-		'author': "U8GQW24TY",
+		'author': "U9QQTDEF7",
 		'frequency': 0,
 		'team': "rollout",
 		'timestamp': unix_time
 		}
-	res = es.index(index="note-index", body=doc) 
+	res = es.index(index="note-index", doc_type='note', body=doc) 
 
 #res = es.search(index="author-index", body=query)
 
@@ -79,8 +81,8 @@ for note in (records):
 
 #res = es.index(index="person-index", doc_type='person', body=doc2) 
 
-#es.indices.refresh(index="note-index")
-#es.indices.refresh(index="person-index")
+es.indices.refresh(index="note-index")
+#es.indices.refresh(index="author-index")
 
 #res = es.search(index="note-index", body={"query": {"match_all": {}}})
 #print("Got %d Hits:" % res['hits']['total'])

@@ -14,8 +14,9 @@ def execute_event(event_data):
 
 	if event_data["type"] == 'interactive_message': 
 		print (event_data)
-		id = event_data["callback_id"].lstrip("note_selection")
-		globals.es.delete(index="note-index", doc_type='note', id=id)
+		id = event_data["callback_id"] #.lstrip("note_selection")
+		print ("ID TO BE DELETED: " + id)
+		globals.es.delete(index="note-index", doc_type='note', id=id[14:])
 		
 		channel = event_data["channel"]["id"]
 		message = "Note `" + event_data["original_message"]["attachments"][int(event_data["attachment_id"])-1]["text"] + "` has been deleted!"
@@ -43,7 +44,14 @@ def execute_event(event_data):
 		
 	attachments = []
 	
-	for idx in range(notes["hits"]["total"]):
+	if (int(notes["hits"]["total"]) >= 10):
+		total = 10
+	elif (int(notes["hits"]["total"]) == 0):
+		total = 0
+	else:
+		total = int(notes["hits"]["total"])
+	
+	for idx in range(total):
 		record = {}
 		print ("record " + str(idx))
 		record["text"] = notes["hits"]["hits"][idx]["_source"]["note"]
@@ -58,6 +66,7 @@ def execute_event(event_data):
 			]
 		record["ts"] = notes["hits"]["hits"][idx]["_source"]["timestamp"]
 		record["callback_id"] = "note_selection" + notes["hits"]["hits"][idx]["_id"]
+		print ("IDS: " + notes["hits"]["hits"][idx]["_id"])
 		attachments.append(record)
 	
 	globals.slack_client.api_call("chat.postMessage", channel=channel, text="Here are your notes:", attachments=attachments)
