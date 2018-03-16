@@ -102,7 +102,7 @@ def execute_event(event_data):
 					"value": user_notes["hits"]["hits"][idx]["_source"]["note"]
 				}
 		]
-		record["footer"] = user_notes["hits"]["hits"][idx]["_source"]["author"]
+		record["footer"] = "<@" + user_notes["hits"]["hits"][idx]["_source"]["author"] + ">"
 		record["ts"] = user_notes["hits"]["hits"][idx]["_source"]["timestamp"]
 		#record["callback_id"] = "note_selection" + user_notes["hits"]["hits"][idx]["_id"]
 		attachments.append(record)
@@ -117,12 +117,15 @@ def execute_event(event_data):
 					"value": team_notes["hits"]["hits"][idx]["_source"]["note"]
 				}
 		]
-		record["footer"] = team_notes["hits"]["hits"][idx]["_source"]["author"]
+		record["footer"] = "<@" + team_notes["hits"]["hits"][idx]["_source"]["author"] + ">"
 		record["ts"] = team_notes["hits"]["hits"][idx]["_source"]["timestamp"]
 		#record["callback_id"] = "note_selection" + team_notes["hits"]["hits"][idx]["_id"]
 		attachments.append(record)
 	
-	globals.slack_client.api_call("chat.postMessage", channel=channel, text="Here what I found:", attachments=attachments)
+	if (team_idx == 0 and user_idx == 0):
+		globals.slack_client.api_call("chat.postMessage", channel=channel, text="No notes found!", attachments=None)
+	else:
+		globals.slack_client.api_call("chat.postMessage", channel=channel, text="Here what I found:", attachments=attachments)
 	
 	print ("review")
 	
