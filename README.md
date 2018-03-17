@@ -5,17 +5,24 @@ Rationale: A large amount of knowledge within the organization is considered 'tr
 
 A better solution would be to use an existing rapidly accessible platform, like Slack, to store tidbits and retrieve data about a particular issue. The information can be held centrally as to be cross-functional and shared by all, with searches favoring one's team or role. For data storage, the ELK stack can be used (Elasticsearch, Kibana, Logstash) as search and indexing operations are already baked-in. A python flask server handles the processing between the two.
 
-Front End: Slack
-Back End: Python Flask Server 
-Data: ELK 
+*Front End: Slack
+*Back End: Python Flask Server 
+*Data: ELK 
+
+Packages are handled by pipenv (you should be using it if you aren't!)
+
+Design Pattern Used:
+* Facade
+* Command
+* Singleton (as best as it can be in Python)
 
 ### Screenshots
 <p align="center">
  <img src="https://user-images.githubusercontent.com/8539492/37557057-3ad23dea-29d5-11e8-9a31-28dd64d1bf0b.PNG" width="200"/>
-  <img src="https://user-images.githubusercontent.com/8539492/37557058-3ae2ac8e-29d5-11e8-8dbb-509c2eda2893.PNG" width="200"/>
-    <img src="https://user-images.githubusercontent.com/8539492/37557059-3af1d268-29d5-11e8-9bd0-82f1b60d3958.PNG" width="200"/>
-    <img src="https://user-images.githubusercontent.com/8539492/37557060-3b01731c-29d5-11e8-8be3-718963e12265.PNG" width="200"/>
-    <img src="https://user-images.githubusercontent.com/8539492/37557061-3b1182f2-29d5-11e8-9fdd-2e76e2d2f8c9.PNG" width="200"/>
+ <img src="https://user-images.githubusercontent.com/8539492/37557058-3ae2ac8e-29d5-11e8-8dbb-509c2eda2893.PNG" width="200"/>
+ <img src="https://user-images.githubusercontent.com/8539492/37557059-3af1d268-29d5-11e8-9bd0-82f1b60d3958.PNG" width="200"/>
+ <img src="https://user-images.githubusercontent.com/8539492/37557060-3b01731c-29d5-11e8-8be3-718963e12265.PNG" width="200"/>
+ <img src="https://user-images.githubusercontent.com/8539492/37557061-3b1182f2-29d5-11e8-9fdd-2e76e2d2f8c9.PNG" width="200"/>
 </p>
 
 ### Setup - Windows
