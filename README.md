@@ -5,9 +5,9 @@ Rationale: A large amount of knowledge within the organization is considered 'tr
 
 A better solution would be to use an existing rapidly accessible platform, like Slack, to store tidbits and retrieve data about a particular issue. The information can be held centrally as to be cross-functional and shared by all, with searches favoring one's team or role. For data storage, the ELK stack can be used (Elasticsearch, Kibana, Logstash) as search and indexing operations are already baked-in. A python flask server handles the processing between the two.
 
-*Front End: Slack
-*Back End: Python Flask Server 
-*Data: ELK 
+* Front End: Slack
+* Back End: Python Flask Server 
+* Data: ELK 
 
 Packages are handled by pipenv (you should be using it if you aren't!)
 
