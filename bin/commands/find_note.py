@@ -92,7 +92,7 @@ def execute_event(event_data):
 	else:
 		team_idx = int(team_notes["hits"]["total"])
 		
-	for idx in range(user_idx):
+	for idx in range(user_idx):	# The following two loops should be condensed
 		record = {}
 
 		print ("User record " + str(idx))

@@ -1,47 +1,45 @@
-# make sure ES is up and running
-#import requests
-#res = requests.get('http://localhost:9200')
-#print(res.content)
+# Quick and dirty data generator for testing
+# Inserts data into ES indexes
 
 #connect to our cluster
 from datetime import datetime
 from elasticsearch import Elasticsearch
-es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 import json
 import requests
 import csv
 import time
+
+es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 records = []
 
-if (es.indices.exists(index="note-index")):
+if (es.indices.exists(index="note-index")): # Check if index exists
 	es.indices.delete(index="note-index")
 	
 if (es.indices.exists(index="author-index")):
 	es.indices.delete(index="author-index")
 
-doc1 = {
+doc1 = {	# User one
 	'author': 'U8GQW24TY',
 	'team': 'rollout'
 	}
 	
-doc2 = {
+doc2 = { # User two
 	'author': 'U8GQW26TY',
 	'team': 'rollout'
 	}
 
-res = es.index(index="author-index", doc_type='author', body=doc1) 
+res = es.index(index="author-index", doc_type='author', body=doc1) # Insert users
 res = es.index(index="author-index", doc_type='author', body=doc2) 
-es.indices.refresh(index="author-index")	
 	
 dt = datetime.now()
 unix_time = time.mktime(dt.timetuple())
 
-with open('testData1.csv') as csvDataFile:
+with open('testData1.csv') as csvDataFile:	# Read Files
     csvReader = csv.reader(csvDataFile)
     for row in csvReader:
         records.append(row[0])
 
-for note in (records):		
+for note in (records):		# Generate logs and insert
 # Save note to note-index
 	doc = {
 		'note': note,
@@ -69,23 +67,8 @@ for note in (records):
 		}
 	res = es.index(index="note-index", doc_type='note', body=doc) 
 
-#res = es.search(index="author-index", body=query)
-
-#if (res['hits']['hits'][0]['_source']['team']) is None:
-#	print ("Hey yo")
-
 #parsed = json.loads(res)
 #print (json.dumps(parsed, indent=4, sort_keys=True))
 
-#res = es.index(index="note-index", doc_type='note', body=doc1) 
-
-#res = es.index(index="person-index", doc_type='person', body=doc2) 
-
-es.indices.refresh(index="note-index")
-#es.indices.refresh(index="author-index")
-
-#res = es.search(index="note-index", body={"query": {"match_all": {}}})
-#print("Got %d Hits:" % res['hits']['total'])
-#for hit in res['hits']['hits']:
-#    print("%(timestamp)s %(author)s: %(note)s" % hit["_source"])
-
+es.indices.refresh(index="note-index")	# Refresh Indexes
+es.indices.refresh(index="author-index")	
