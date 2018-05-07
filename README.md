@@ -10,6 +10,8 @@ A better solution would be to use an existing rapidly accessible platform, like 
 * Data: ELK 
 
 Packages are handled by pipenv (you should be using it if you aren't!)
+* pipenv install
+* pipenv shell
 
 Design Pattern Used:
 * Facade
