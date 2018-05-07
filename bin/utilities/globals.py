@@ -18,7 +18,8 @@ def init():
 	global slack_client
 
 	# Connect to Elasticsearch instance
-	es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+	ELASTICSEARCH_ENDPOINT = os.environ["ELASTICSEARCH_ENDPOINT"]
+	es = Elasticsearch([{'host': ELASTICSEARCH_ENDPOINT, 'port': 9200}])
 	
 	# Create a SlackClient for your bot to use for Web API requests
 	SLACK_BOT_TOKEN = os.environ["SLACK_BOT_TOKEN"]
