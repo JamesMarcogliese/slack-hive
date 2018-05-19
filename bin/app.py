@@ -6,10 +6,14 @@ A routing layer for the Hive Slack app
 from slackserver import SlackEventAdapter
 from utilities import message_filter
 from utilities import globals
+import command_dispatcher
+import message_filter
+import logging
 import os
 
-# Import command_dispatcher
-import command_dispatcher
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Our app's Slack Event Adapter for receiving actions via the Events API
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
@@ -21,10 +25,11 @@ globals.init()
 # Responder to direct messages
 @slack_events_adapter.on("message")
 def handle_message(event_data):
-	print ("\n -------- BEGINNING OF MESSAGE --------\n")
-	print (event_data)
-	print ("\n -------- END OF MESSAGE --------\n")
-	if ((event_data.get("event").get("channel_type") == "app_home") and (event_data.get("event").get("bot_id") is None)):
+	logger.info('Incoming event...')
+	logger.debug(event_data)
+	if (message_filter.is_app_home_event(event_data)
+	  and not message_filter.is_bot_message(event_data) 		  
+	  and message_filter.is_whitelisted_user(event_data)):
 		command_dispatcher.dispatch_event(event_data)
 
 @slack_events_adapter.on("message_action")

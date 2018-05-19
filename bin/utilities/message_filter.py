@@ -3,11 +3,15 @@
 A module to store message filtering logic for the Hive Slack app 
 """
 
-def is_direct_message(event_data):	# DM with a user
-	return event_data['event']['channel'].startswith('D')
+user_whitelist = []
+with open('./resources/user_whitelist.txt', 'r') as f:	# Load whitelist from resources
+	user_whitelist = f.read().splitlines()
+
+def is_app_home_event(event_data):		# From a message.app_home event
+	return event_data.get("event").get("channel_type") == "app_home"
 	
-def is_public_message(event_data):	# Public channel message
-	return event_data['event']['channel'].startswith('C')
+def is_bot_message(event_data):			# Message from a bot
+	return event_data.get("event").get("bot_id") is not None
 	
-def is_private_message(event_data):	# Private Channel or multi-person DM
-	return event_data['event']['channel'].startswith('G')
+def is_whitelisted_user(event_data):	# User in user_whitelist list	 
+	return event_data.get("event").get("user") in user_whitelist
