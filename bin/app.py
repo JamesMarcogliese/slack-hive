@@ -14,6 +14,9 @@ import os
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Enable/Disable whitelist
+message_filter.use_whitelist(True)
+
 # Our app's Slack Event Adapter for receiving actions via the Events API
 SLACK_VERIFICATION_TOKEN = os.environ["SLACK_VERIFICATION_TOKEN"]
 slack_events_adapter = SlackEventAdapter(SLACK_VERIFICATION_TOKEN, "/slack")
