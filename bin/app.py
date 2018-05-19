@@ -7,7 +7,6 @@ from slackserver import SlackEventAdapter
 from utilities import message_filter
 from utilities import globals
 import command_dispatcher
-import message_filter
 import logging
 import os
 
