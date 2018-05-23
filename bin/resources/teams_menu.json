@@ -7,24 +7,16 @@
 		"actions": [
 			{
 				"name": "teams_list",
-				"text": "Select your team...",
+				"text": "Select your default team...",
 				"type": "select",
 				"options": [
 					{
-						"text": "Account Directors",
-						"value": "account"
-					},
+						"text": "Courses",
+						"value": "courses"
+					},					
 					{
 						"text": "Data",
 						"value": "data"
-					},
-					{
-						"text": "Design",
-						"value": "design"
-					},
-					{
-						"text": "Enhancements",
-						"value": "enhancements"
 					},
 					{
 						"text": "Finance",
@@ -35,44 +27,52 @@
 						"value": "hr"
 					},
 					{
+						"text": "Insights",
+						"value": "insights"
+					},
+					{
+						"text": "IOS",
+						"value": "ios"
+					},
+					{
 						"text": "IT",
 						"value": "it"
 					},
 					{
-						"text": "Job Board Enterprise",
-						"value": "jobBoardEnterprise"
+						"text": "JB Enterprise",
+						"value": "jbent"
 					},
 					{
-						"text": "Job Board Pro & Courses",
-						"value": "jobBoardPro&Courses"
+						"text": "JB Pro",
+						"value": "jbpro"
 					},
 					{
 						"text": "Marketing",
 						"value": "marketing"
 					},
 					{
-						"text": "New Products",
+						"text": "New Product",
 						"value": "Sales"
 					},
 					{
-						"text": "Rollout",
-						"value": "rollout"
+						"text": "Sales",
+						"value": "sales"
+					},
+					{
+						"text": "Scraping",
+						"value": "scraping"
 					},
 					{
 						"text": "Security",
 						"value": "security"
 					},
 					{
-						"text": "Support",
-						"value": "support"
-					},
-					{
 						"text": "Systems",
 						"value": "systems"
 					},
 					{
-						"text": "Test",
-						"value": "test"
+						"text": "Testing",
+						"value": "testing"
 					}
 				]
 			}
