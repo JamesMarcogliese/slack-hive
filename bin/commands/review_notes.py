@@ -6,6 +6,8 @@ A command module for the Hive Slack app
 import sys
 sys.path.append('../')
 from utilities import globals
+from utilities import es_queries
+import classes
 
 def pattern():
 	return '^review'
@@ -24,29 +26,18 @@ def execute_event(event_data):
 		return
 	
 	channel = event_data["event"]["channel"]	
-	query = {
-			"sort" : [
-				{ "timestamp": {"order": "desc"}} 
-			],
-			"query": {
-				"match": {
-					"author": event_data['event']['user'] 
-				}
-			}
-		}
 	
-	if (globals.es.indices.exists(index="note-index")):
-		notes = globals.es.search(index="note-index", body=query)
+	notes = es_queries.get_all_user_notes(event_data['event']['user'])
 	
-	if notes["hits"]["total"] == 0:
+	if (len(notes) == 0):
 		globals.slack_client.api_call("chat.postMessage", channel=channel, text="You haven't saved any notes yet!")
 		return
 		
 	attachments = []
 	
-	if (int(notes["hits"]["total"]) >= 10):
+	if (len(notes) >= 10): # I'm only displaying the first 10 for demo, will need pageation for prod
 		total = 10
-	elif (int(notes["hits"]["total"]) == 0):
+	elif (len(notes) == 0):
 		total = 0
 	else:
 		total = int(notes["hits"]["total"])
@@ -54,7 +45,7 @@ def execute_event(event_data):
 	for idx in range(total):
 		record = {}
 		print ("record " + str(idx))
-		record["text"] = notes["hits"]["hits"][idx]["_source"]["note"]
+		record["text"] = notes[idx].note
 		record["fallback"] = "Please upgrade slack to see this message!"
 		record["actions"] = [
 				{
@@ -64,9 +55,9 @@ def execute_event(event_data):
 					"value": "delete"
 				}   
 			]
-		record["ts"] = notes["hits"]["hits"][idx]["_source"]["timestamp"]
-		record["callback_id"] = "note_selection" + notes["hits"]["hits"][idx]["_id"]
-		print ("IDS: " + notes["hits"]["hits"][idx]["_id"])
+		record["ts"] = notes[idx].timestamp
+		record["callback_id"] = "note_selection" + notes[idx].doc_id
+		print ("IDS: " + notes[idx].doc_id)
 		attachments.append(record)
 	
 	globals.slack_client.api_call("chat.postMessage", channel=channel, text="Here are your notes:", attachments=attachments)

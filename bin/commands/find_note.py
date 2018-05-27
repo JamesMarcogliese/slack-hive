@@ -6,6 +6,9 @@ A command module for the Hive Slack app
 import sys
 sys.path.append('../')
 from utilities import globals
+from utilities import es_queries
+import classes
+
 
 def pattern():
 	return '^find (.*)'
@@ -17,80 +20,33 @@ def execute_event(event_data):
 	channel = event_data["event"]["channel"]	
 
 	#Search for author's team from author index
-	query = {
-			"query": {
-				"match": {
-					"author": user
-				}
-			}
-		}
-	if (globals.es.indices.exists(index="author-index")):
-		author = globals.es.search(index="author-index", body=query)
-	
-	if (author['hits']['total'] == 0) or not(globals.es.indices.exists(index="author-index")):
+	author = es_queries.get_team(user)
+		
+	if (author is None):
 		message = ("Wait! :raised_hand:I need to know what team you're on before I can search for notes!\n" 
 				   "Please set your team by using the 'team' command!"
 				   )
 		globals.slack_client.api_call("chat.postMessage", channel=channel, text=message, attachments=None)
 		return 
 		
-	user_query_own = {
-		"query": {
-			"bool": {
-				"should": [
-					{"match": { "note": message }}
-				],
-				"must": {
-					"match": { "author": user }
-				},
-				"minimum_should_match": "100%"
-			}
-		}
-	}
-	
-	user_query_team = {
-		"query": {
-			"bool": {
-				"should": [
-					{"match": { "note": message }}
-				],
-				"must": {
-					"match": { "team": author["hits"]["hits"][0]["_source"]["team"] }
-				},
-				"must_not": {
-					"match": { "author": user }
-				},
-				"minimum_should_match": "100%"
-			}
-		}
-	}
-	
-	if (globals.es.indices.exists(index="note-index")):
-		user_notes = globals.es.search(index="note-index", body=user_query_own)
-		team_notes = globals.es.search(index="note-index", body=user_query_team)
-	else:
-		print ("Note-Index not found!")
+	own_notes = es_queries.search_user_notes(author.author, message)
+	team_notes = es_queries.search_team_notes(author.author, author.team, message)
 		
-		
-	#-------------------------------------------------------------	
-	
-	
-	
 	attachments = [] # --------------------------------------------------------------------------
 	
-	if (int(user_notes["hits"]["total"]) >= 4):
+	if (len(own_notes) >= 4):
 		user_idx = 4
-	elif (int(user_notes["hits"]["total"]) == 0):
+	elif (len(own_notes)) == 0):
 		user_idx = 0
 	else:
-		user_idx = int(user_notes["hits"]["total"])
+		user_idx = len(own_notes)
 		
-	if (int(team_notes["hits"]["total"]) >= 4):
+	if (len(team_notes) >= 4):
 		team_idx = 4
-	elif (int(team_notes["hits"]["total"]) == 0):
+	elif (len(team_notes) == 0):
 		team_idx = 0
 	else:
-		team_idx = int(team_notes["hits"]["total"])
+		team_idx = len(team_notes)
 		
 	for idx in range(user_idx):	# The following two loops should be condensed
 		record = {}
@@ -99,11 +55,11 @@ def execute_event(event_data):
 		record["color"] = "#000000"
 		record["fields"] = [
 				{
-					"value": user_notes["hits"]["hits"][idx]["_source"]["note"]
+					"value": own_notes[idx].note
 				}
 		]
-		record["footer"] = "<@" + user_notes["hits"]["hits"][idx]["_source"]["author"] + ">"
-		record["ts"] = user_notes["hits"]["hits"][idx]["_source"]["timestamp"]
+		record["footer"] = "<@" + own_notes[idx].author + ">"
+		record["ts"] = own_notes[idx].timestamp
 		#record["callback_id"] = "note_selection" + user_notes["hits"]["hits"][idx]["_id"]
 		attachments.append(record)
 		
@@ -114,11 +70,11 @@ def execute_event(event_data):
 		record["color"] = "#0079c0"
 		record["fields"] = [
 				{
-					"value": team_notes["hits"]["hits"][idx]["_source"]["note"]
+					"value": team_notes[idx].note
 				}
 		]
-		record["footer"] = "<@" + team_notes["hits"]["hits"][idx]["_source"]["author"] + ">"
-		record["ts"] = team_notes["hits"]["hits"][idx]["_source"]["timestamp"]
+		record["footer"] = "<@" + team_notes[idx].author + ">"
+		record["ts"] = team_notes[idx].timestamp
 		#record["callback_id"] = "note_selection" + team_notes["hits"]["hits"][idx]["_id"]
 		attachments.append(record)
 	
