@@ -29,18 +29,22 @@ globals.init()
 if (not es_queries.indexes_exist()):
 	es_queries.init_indexes()
 
-# Responder to direct messages
+# Handle to direct messages
 @slack_events_adapter.on("message")
 def handle_message(event_data):
 	logger.info('Incoming event...')
-	logger.debug(event_data)
 	if (message_filter.is_app_home_event(event_data)
-	  and not message_filter.is_bot_message(event_data) 		  
+	  and not message_filter.is_bot_message(event_data) 		
+	  and not message_filter.is_changed_message(event_data)
 	  and message_filter.is_whitelisted_user(event_data)):
+		logger.debug(event_data)
 		command_dispatcher.dispatch_event(event_data)
 
+# Handle message actions 
 @slack_events_adapter.on("message_action")
 def message_action(action_data):
+	logger.info('Incoming action...')
+	logger.debug(action_data)
 	command_dispatcher.dispatch_action(action_data)
 
 # Flask server with the default endpoint on port 3000

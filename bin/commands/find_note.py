@@ -4,6 +4,7 @@ A command module for the Hive Slack app
 """
 
 import sys
+import re
 sys.path.append('../')
 from utilities import globals
 from utilities import es_queries
@@ -15,7 +16,8 @@ def pattern():
 
 def execute_event(event_data):
 	print ("findNote")
-	message = event_data['event']['text'].lstrip('find ')
+	pattern = re.compile('^find ')
+	message = pattern.sub('', event_data['event']['text'])
 	user = event_data['event']['user'] 
 	channel = event_data["event"]["channel"]	
 
@@ -36,7 +38,7 @@ def execute_event(event_data):
 	
 	if (len(own_notes) >= 4):
 		user_idx = 4
-	elif (len(own_notes)) == 0):
+	elif (len(own_notes) == 0):
 		user_idx = 0
 	else:
 		user_idx = len(own_notes)
@@ -83,8 +85,4 @@ def execute_event(event_data):
 	else:
 		globals.slack_client.api_call("chat.postMessage", channel=channel, text="Here what I found:", attachments=attachments)
 	
-	print ("review")
-	
-
-	
-	
+	return

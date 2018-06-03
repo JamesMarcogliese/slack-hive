@@ -19,9 +19,9 @@ class NoteRecord(object):
 		
 	@classmethod	
 	def fromjson(cls, jsondata):
-		cls.note = jsondata["_source"]["note"]
-		cls.author = jsondata["_source"]["author"]
-		cls.team = jsondata["_source"]["team"]
-		cls.timestamp = jsondata["_source"]["timestamp"]
-		cls.doc_id = jsondata["_id"]
-		return cls
+		note = jsondata["_source"]["note"]
+		author = jsondata["_source"]["author"]
+		team = jsondata["_source"]["team"]
+		timestamp = jsondata["_source"]["timestamp"]
+		doc_id = jsondata["_id"]
+		return cls(note,author,team,timestamp,doc_id)

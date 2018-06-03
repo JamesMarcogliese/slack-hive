@@ -40,7 +40,7 @@ def execute_event(event_data):
 	elif (len(notes) == 0):
 		total = 0
 	else:
-		total = int(notes["hits"]["total"])
+		total = len(notes)
 	
 	for idx in range(total):
 		record = {}

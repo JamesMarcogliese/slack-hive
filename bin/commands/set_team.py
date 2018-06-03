@@ -17,7 +17,7 @@ def execute_event(event_data):
 	print ("setTeam")
 	print (event_data)
 	if event_data["type"] == 'event_callback':
-		# Send the list to the user
+		# Send the team list to the user
 		teams_menu = json.load(open('./resources/teams_menu.json'))
 		channel = event_data["event"]["channel"]
 		globals.slack_client.api_call("chat.postMessage", channel=channel, text="What team do you belong to?", attachments=teams_menu)

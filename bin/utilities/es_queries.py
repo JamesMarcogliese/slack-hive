@@ -4,30 +4,30 @@ A module to store Elasticsearch query logic for the Hive Slack app
 
 No function should return pure json.
 """
-
+import sys
 sys.path.append('../')
-from classes import NoteRecord
+from classes.NoteRecord import NoteRecord
+from classes.AuthorRecord import AuthorRecord
 from utilities import globals
 from datetime import datetime
 import time
 import json
 
-def get_team(author):
+def get_team(user):
 	query = {
 		"query": {
 			"term": {
-				"field": "author",
-					"value": author
+				"user": user
 			}
 		}
 	}
 
-	author = globals.es.search(index="author-index", body=query)
+	results = globals.es.search(index="author-index", body=query)
 	
-	if (author['hits']['total'] == 0):
+	if (results['hits']['total'] == 0):
 		return None
 	else:
-		return author["hits"]["hits"][0]["_source"]["team"]
+		return AuthorRecord.fromjson(results["hits"]["hits"][0])
 	
 def delete_author_doc(doc_id):
 	globals.es.delete(index="author-index", doc_type='author', id=doc_id)
@@ -40,7 +40,7 @@ def delete_note_doc(doc_id):
 
 def add_author(user, selected_team):
 	query = {
-		"author": user,
+		"user": user,
 		"team": selected_team
 		}
 	
@@ -53,7 +53,7 @@ def search_user_notes(user, keywords):
 			"bool": {
 				"must": [
 					{"common": { "note": {"query": keywords }}},
-					{"term": {"field": "author", "value": user}}
+					{"term": {"author" : user }}
 				]
 			}
 		}
@@ -72,11 +72,11 @@ def search_team_notes(user, team, keywords):
 			"bool": {
 				"must": [
 					{"common": { "note": {"query": keywords }}},
-					{"term": {"field": "team", "value": team}}
+					{"term": {"team": team }}
 				],
-				"must_not": {
-					{"term": {"field": "user", "value": user}}
-				}
+				"must_not": [
+					{"term": {"author": user }}
+				]
 			}
 		}
 	}
@@ -115,7 +115,6 @@ def save_note(note, author, team):
 	doc = {
 		'note': note,
 		'author': author,
-		'frequency': 0,
 		'team': team,
 		'timestamp': unix_time
 		}
@@ -124,10 +123,50 @@ def save_note(note, author, team):
 	return
 	
 def indexes_exist():
-	return globals.es.indices.exists(index="note-index") 
-		and globals.es.indices.exists(index="author-index")
+	return globals.es.indices.exists(index="note-index") and globals.es.indices.exists(index="author-index")
 	
 def init_indexes():
-	add_author("initial_user", "initial_team")
-	save_note("initial_note","initial_user","initial_team")
+	author_mapping_query = {
+		"mappings" : {
+			"author" : {
+				"properties" : {
+					"user" : { 
+						"type" : "keyword" 
+					},
+					"team" : {
+						"type" : "keyword"
+					}
+				}
+			}
+		}
+	}
+	
+	note_mapping_query = {
+		"mappings" : {
+			"note" : {
+				"properties" : {
+					"author" : { 
+						"type" : "keyword" 
+					},
+					"note" : {
+						"type" : "text"
+					},
+					"team" : {
+						"type" : "keyword"
+					},
+					"timestamp" : {
+						"type" : "date"
+					}
+				}
+			}
+		}
+	}
+	globals.es.indices.create(index='author-index', body=author_mapping_query)
+	globals.es.indices.create(index='note-index', body=note_mapping_query)
+	#add_author("initial_user", "initial_team")
+	#save_note("initial_note","initial_user","initial_team")
+	return
+	
+def delete_indexes():
+	globals.es.indices.delete(index='*')
 	return

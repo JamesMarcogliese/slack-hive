@@ -4,6 +4,7 @@ A command module for the Hive Slack app
 """
 
 import sys
+import re
 sys.path.append('../')
 from utilities import globals
 from datetime import datetime
@@ -17,6 +18,7 @@ def pattern():
 def execute_event(event_data):
 	print ("SaveNote")
 	channel = event_data["event"]["channel"]
+	user = event_data["event"]["user"]
 	
 	#Search for author's team from author index
 	author = es_queries.get_team(user)
@@ -29,7 +31,9 @@ def execute_event(event_data):
 		return 
 	
 	# Save note to note-index
-	es_queries.save_note(event_data["event"]["text"].lstrip("save "), event_data["event"]["user"], author["hits"]["hits"][0]["_source"]["team"])
+	pattern = re.compile('^save ')
+	message = pattern.sub('', event_data['event']['text'])
+	es_queries.save_note(message, user, author.team)
 
 	globals.slack_client.api_call("chat.postMessage", channel=channel, text="Note saved!", attachments=None)
 	return
