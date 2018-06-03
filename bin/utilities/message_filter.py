@@ -18,6 +18,9 @@ def is_app_home_event(event_data):		# From a message.app_home event
 def is_bot_message(event_data):			# Message from a bot
 	return event_data.get("event").get("bot_id") is not None
 	
+def is_changed_message(event_data):
+	return event_data.get("event").get("subtype") == "message_changed"
+	
 def is_whitelisted_user(event_data):	# User in user_whitelist list	
 	if (not user_whitelist_enabled):
 		return True
